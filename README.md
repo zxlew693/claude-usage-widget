@@ -1,3 +1,5 @@
+<img src="assets/logo.svg" width="96" alt="Claude Usage Widget logo">
+
 # Claude Usage Widget
 
 A small floating Windows desktop card that shows your Claude Pro/Max plan limits (5-hour session, weekly, per-model weekly) and their reset countdowns.

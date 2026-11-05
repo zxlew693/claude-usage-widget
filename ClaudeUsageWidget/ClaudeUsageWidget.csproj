@@ -11,7 +11,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Version>0.1.0</Version>
     <Product>Claude Usage Widget</Product>
+    <ApplicationIcon>..\assets\app.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="..\assets\app.ico" Link="Assets\app.ico" />
+    <Resource Include="..\assets\logo-256.png" Link="Assets\logo.png" />
+  </ItemGroup>
 
   <!-- Single-file publish: bundle WPF's native DLLs into the exe and compress it. -->
   <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
