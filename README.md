@@ -6,11 +6,11 @@ A small floating Windows desktop card that shows your Claude Pro/Max plan limits
 
 ## Download
 
-1. Download `ClaudeUsageWidget.exe` from the [latest release](https://github.com/zxlew693/claude-usage-widget/releases/latest). There's nothing to install, and you don't need .NET.
+1. Download `claude-usage-widget.exe` from the [latest release](https://github.com/zxlew693/claude-usage-widget/releases/latest). There's nothing to install, and you don't need .NET.
 2. Run it. Because the exe isn't code-signed, Windows SmartScreen may show **"Windows protected your PC"** the first time. Click **More info → Run anyway**.
 3. You need to have logged in to [Claude Code](https://claude.com/claude-code) on this PC, because the widget uses Claude Code's sign-in.
 
-Each release also includes a `.sha256` file. To check that the download is intact: `Get-FileHash ClaudeUsageWidget.exe`.
+Each release also includes a `.sha256` file. To check that the download is intact: `Get-FileHash claude-usage-widget.exe`.
 
 ## How it works
 
@@ -30,7 +30,7 @@ dotnet run --project ClaudeUsageWidget
 dotnet publish ClaudeUsageWidget -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
 ```
 
-Then run `publish\ClaudeUsageWidget.exe`.
+Then run `publish\claude-usage-widget.exe`.
 
 ## Releasing
 
