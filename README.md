@@ -2,6 +2,14 @@
 
 A small floating Windows desktop card that shows your Claude Pro/Max plan limits (5-hour session, weekly, per-model weekly) and their reset countdowns.
 
+## Download
+
+1. Download `ClaudeUsageWidget.exe` from the [latest release](https://github.com/zxlew693/claude-usage-widget/releases/latest). There's nothing to install, and you don't need .NET.
+2. Run it. Because the exe isn't code-signed, Windows SmartScreen may show **"Windows protected your PC"** the first time. Click **More info → Run anyway**.
+3. You need to have logged in to [Claude Code](https://claude.com/claude-code) on this PC, because the widget uses Claude Code's sign-in.
+
+Each release also includes a `.sha256` file. To check that the download is intact: `Get-FileHash ClaudeUsageWidget.exe`.
+
 ## How it works
 
 - It reads the OAuth token that Claude Code stores in `%USERPROFILE%\.claude\.credentials.json` (or in `CLAUDE_CONFIG_DIR` if that is set). It only reads this file and never refreshes the token, because refreshing would log Claude Code out.
@@ -20,7 +28,16 @@ dotnet run --project ClaudeUsageWidget
 dotnet publish ClaudeUsageWidget -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
 ```
 
-Then run `publish\ClaudeUsageWidget.exe`. Right-click the card and choose **Start with Windows** to launch it at login.
+Then run `publish\ClaudeUsageWidget.exe`.
+
+## Releasing
+
+Push a version tag. GitHub Actions (`.github/workflows/release.yml`) then builds the exe and publishes it as a release:
+
+```powershell
+git tag v0.2.0
+git push origin v0.2.0
+``` Right-click the card and choose **Start with Windows** to launch it at login.
 
 ## Using it
 

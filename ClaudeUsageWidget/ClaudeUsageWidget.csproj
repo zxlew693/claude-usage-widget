@@ -13,4 +13,11 @@
     <Product>Claude Usage Widget</Product>
   </PropertyGroup>
 
+  <!-- Single-file publish: bundle WPF's native DLLs into the exe and compress it. -->
+  <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
 </Project>

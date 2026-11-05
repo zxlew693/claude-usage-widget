@@ -1,0 +1,43 @@
+name: Release
+
+# Push a version tag (e.g. `git tag v0.1.0 && git push origin v0.1.0`) to build
+# the single-file exe and publish it as a GitHub Release.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Publish single-file exe
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          dotnet publish ClaudeUsageWidget -c Release -r win-x64 --self-contained `
+            -p:PublishSingleFile=true -p:Version=$version -o publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Write checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash publish/ClaudeUsageWidget.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  ClaudeUsageWidget.exe" | Out-File -Encoding ascii publish/ClaudeUsageWidget.exe.sha256
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            publish/ClaudeUsageWidget.exe
+            publish/ClaudeUsageWidget.exe.sha256
+          generate_release_notes: true
