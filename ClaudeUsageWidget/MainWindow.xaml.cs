@@ -140,6 +140,19 @@ public partial class MainWindow : Window
         }
     }
 
+    private void OnShortcutsClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            ShortcutManager.CreateAll();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, "Couldn't create the shortcuts:\n" + ex.Message, "Claude Usage Widget",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
     private void OnExitClick(object sender, RoutedEventArgs e) => Close();
 
     private static double ParseTag(MenuItem item) =>

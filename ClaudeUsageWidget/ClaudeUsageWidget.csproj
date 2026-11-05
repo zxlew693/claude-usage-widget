@@ -11,6 +11,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Version>0.1.0</Version>
     <Product>Claude Usage Widget</Product>
+    <!-- Shown as the "description" in Task Manager, Startup apps and file Properties. -->
+    <AssemblyTitle>Claude Usage Widget</AssemblyTitle>
     <ApplicationIcon>..\assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 

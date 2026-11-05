@@ -44,7 +44,8 @@ git push origin v0.2.0
 ## Using it
 
 - Drag the card to move it. The position is saved.
-- Right-click the card (or click ⋯) for: Refresh, Always on top, Compact mode, Opacity, Start with Windows, Exit.
+- Right-click the card (or click ⋯) for: Refresh, Always on top, Compact mode, Opacity, Start with Windows, Add desktop & Start menu shortcuts, Exit.
+- **Add desktop & Start menu shortcuts** creates shortcuts named "Claude Usage Widget" that point at the exe's current location. Move the exe to its permanent folder before you use this.
 - Hover over a bar to see the exact reset time. Hover over the card to see the weekly breakdown by surface.
 
 Settings are saved in `%APPDATA%\ClaudeUsageWidget\settings.json`.

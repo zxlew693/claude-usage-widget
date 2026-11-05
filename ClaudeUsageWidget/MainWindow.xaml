@@ -89,6 +89,7 @@
                     <MenuItem Header="60%" Tag="0.6" IsCheckable="True" Click="OnOpacityClick" />
                 </MenuItem>
                 <MenuItem x:Name="StartupItem" Header="Start with Windows" IsCheckable="True" Click="OnStartupClick" />
+                <MenuItem Header="Add desktop &amp; Start menu shortcuts" Click="OnShortcutsClick" />
                 <Separator />
                 <MenuItem Header="Exit" Click="OnExitClick" />
             </ContextMenu>
