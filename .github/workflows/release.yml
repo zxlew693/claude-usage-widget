@@ -41,3 +41,20 @@ jobs:
             publish/claude-usage-widget.exe
             publish/claude-usage-widget.exe.sha256
           generate_release_notes: true
+
+      # Unsigned MSIX for Microsoft Store upload (the Store signs it). Kept as a workflow
+      # artifact, not a release asset, because an unsigned package can't be installed directly.
+      - name: Build MSIX package
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          ./tools/build-msix.ps1 -Version $version -OutDir artifacts `
+            -IdentityName "${{ vars.MSIX_IDENTITY_NAME || 'UsageMeterForClaude.Dev' }}" `
+            -Publisher "${{ vars.MSIX_PUBLISHER || 'CN=UsageMeterForClaudeDev' }}" `
+            -PublisherDisplayName "${{ vars.MSIX_PUBLISHER_DISPLAY_NAME || 'zxlew693' }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msix-package
+          path: artifacts/*.msix
+          if-no-files-found: error

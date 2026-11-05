@@ -35,6 +35,9 @@ public partial class MainWindow : Window
         ApplySettings();
         PlaceWindow();
 
+        // The Store package already has a Start menu entry.
+        if (PackageInfo.IsPackaged) ShortcutsItem.Visibility = Visibility.Collapsed;
+
         SourceInitialized += (_, _) => NativeMethods.HideFromAltTab(this);
         Loaded += (_, _) =>
         {
@@ -99,13 +102,15 @@ public partial class MainWindow : Window
         menu.IsOpen = true;
     }
 
-    private void OnMenuOpened(object sender, RoutedEventArgs e)
+    private async void OnMenuOpened(object sender, RoutedEventArgs e)
     {
         TopmostItem.IsChecked = Topmost;
         CompactItem.IsChecked = _vm.IsCompact;
-        StartupItem.IsChecked = StartupManager.IsEnabled;
         foreach (var item in OpacityMenu.Items.OfType<MenuItem>())
             item.IsChecked = Math.Abs(ParseTag(item) - Opacity) < 0.01;
+
+        try { StartupItem.IsChecked = await StartupManager.IsEnabledAsync(); }
+        catch { StartupItem.IsChecked = false; }
     }
 
     private void OnRefreshClick(object sender, RoutedEventArgs e) => _poller.RefreshNow();
@@ -128,15 +133,25 @@ public partial class MainWindow : Window
         _settings.Save();
     }
 
-    private void OnStartupClick(object sender, RoutedEventArgs e)
+    private async void OnStartupClick(object sender, RoutedEventArgs e)
     {
+        var wanted = StartupItem.IsChecked;
+        bool actual;
         try
         {
-            StartupManager.SetEnabled(StartupItem.IsChecked);
+            actual = await StartupManager.SetEnabledAsync(wanted);
         }
         catch
         {
-            StartupItem.IsChecked = StartupManager.IsEnabled;
+            actual = !wanted;
+        }
+        StartupItem.IsChecked = actual;
+
+        if (wanted && !actual && PackageInfo.IsPackaged)
+        {
+            MessageBox.Show(this,
+                "Windows didn't allow this. You can turn it on in Settings → Apps → Startup.",
+                PackageInfo.DisplayName, MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 
@@ -148,7 +163,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, "Couldn't create the shortcuts:\n" + ex.Message, "Claude Usage Widget",
+            MessageBox.Show(this, "Couldn't create the shortcuts:\n" + ex.Message, PackageInfo.DisplayName,
                 MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }

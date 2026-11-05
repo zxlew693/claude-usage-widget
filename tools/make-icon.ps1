@@ -11,16 +11,27 @@ function C([string]$hex, [int]$a = 255) {
     [System.Drawing.Color]::FromArgb($a, $c.R, $c.G, $c.B)
 }
 
-function Render([int]$size) {
+# -Glyph draws only the gauge (no dark tile) on a transparent background, sized to
+# about half the image, for the Start menu tile, where Windows supplies the tile colour.
+function Render([int]$size, [switch]$Glyph) {
     $bmp = New-Object System.Drawing.Bitmap $size, $size, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.SmoothingMode = 'AntiAlias'
     $g.PixelOffsetMode = 'HighQuality'
     $g.Clear([System.Drawing.Color]::Transparent)
-    $s = $size / 256.0
-    $g.ScaleTransform($s, $s)
+    if ($Glyph) {
+        # Gauge (with strokes) spans x 37..219 in the 256 box; make it ~48% of the image.
+        $s = 0.48 * $size / 182.0
+        $g.TranslateTransform($size / 2.0, $size / 2.0)
+        $g.ScaleTransform($s, $s)
+        $g.TranslateTransform(-128, -120)
+    } else {
+        $s = $size / 256.0
+        $g.ScaleTransform($s, $s)
+    }
 
     # Tile
+    if (-not $Glyph) {
     $r = 56; $d = $r * 2
     $tile = New-Object System.Drawing.Drawing2D.GraphicsPath
     $tile.AddArc(0, 0, $d, $d, 180, 90); $tile.AddArc(256 - $d, 0, $d, $d, 270, 90)
@@ -28,12 +39,13 @@ function Render([int]$size) {
     $tile.CloseFigure()
     $bg = New-Object System.Drawing.Drawing2D.LinearGradientBrush (New-Object System.Drawing.PointF 0, 0), (New-Object System.Drawing.PointF 0, 256), (C '#2A2A32'), (C '#141418')
     $g.FillPath($bg, $tile)
+    }
 
     # Thicker strokes at tiny sizes so the gauge stays readable.
     $w = if ($size -le 24) { 34 } elseif ($size -le 48) { 30 } else { 26 }
     $rad = 78; $box = New-Object System.Drawing.RectangleF (128 - $rad), (128 - $rad), ($rad * 2), ($rad * 2)
 
-    $track = New-Object System.Drawing.Pen (C '#FFFFFF' 36), $w
+    $track = New-Object System.Drawing.Pen (C '#FFFFFF' $(if ($Glyph) { 70 } else { 36 })), $w
     $track.StartCap = 'Round'; $track.EndCap = 'Round'
     $g.DrawArc($track, $box, 135, 270)
 
@@ -63,6 +75,14 @@ foreach ($sz in $sizes) { $pngs[$sz] = Render $sz }
 
 [System.IO.File]::WriteAllBytes((Join-Path $OutDir 'logo-256.png'), $pngs[256])
 [System.IO.File]::WriteAllBytes((Join-Path $OutDir 'logo-512.png'), (Render 512))
+
+# MSIX package images (Start menu, taskbar, Store logo).
+$msixAssets = Join-Path $PSScriptRoot '..\packaging\Assets'
+New-Item -ItemType Directory -Force $msixAssets | Out-Null
+foreach ($asset in @(@('Square44x44Logo.png', 44), @('StoreLogo.png', 50))) {
+    [System.IO.File]::WriteAllBytes((Join-Path $msixAssets $asset[0]), (Render $asset[1]))
+}
+[System.IO.File]::WriteAllBytes((Join-Path $msixAssets 'Square150x150Logo.png'), (Render 150 -Glyph))
 
 # ICO: ICONDIR + ICONDIRENTRY[] + PNG blobs
 $ms = New-Object System.IO.MemoryStream
